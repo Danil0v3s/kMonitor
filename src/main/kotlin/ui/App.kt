@@ -4,32 +4,65 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import mahm.Reader
 
 @Composable
-fun App() = MaterialTheme {
+fun App(
+    viewModel: AppViewModel = AppViewModel()
+) = MaterialTheme {
     Row(modifier = Modifier.fillMaxSize()) {
-        val menuItems = listOf(
-            MenuItem.Server(
-                content = Server().asContent { ServerUi() },
-                title = "Server configuration"
-            ),
-            MenuItem.Configuration(
-                content = Configuration().asContent { ConfigurationUi() },
-                title = "App setup"
-            ),
-        )
+        val state = viewModel.state.collectAsState(AppState.EMPTY)
 
-        var currentScreen by remember { mutableStateOf(menuItems.first()) }
+        with(state.value) {
+            SideMenu(menuItems, viewModel::changeScreen)
 
-        SideMenu(menuItems) {
-            currentScreen = it
+            // render current screen
+            currentScreen.content()
         }
+    }
+}
 
-        currentScreen.content()
+class AppViewModel {
+
+    private val reader = Reader()
+
+    private val menuItems = listOf(
+        MenuItem.Server(
+            content = Server().asContent { ServerUi(reader) },
+            title = "Server configuration"
+        ),
+        MenuItem.Configuration(
+            content = Configuration().asContent { ConfigurationUi() },
+            title = "App setup"
+        )
+    )
+
+    private val _state = MutableStateFlow(
+        AppState(
+            menuItems = menuItems,
+            currentScreen = menuItems.first()
+        )
+    )
+    val state: Flow<AppState>
+        get() = _state
+
+    fun changeScreen(menuItem: MenuItem) {
+        _state.value = _state.value.copy(currentScreen = menuItem)
+    }
+}
+
+data class AppState(
+    val menuItems: List<MenuItem>,
+    val currentScreen: MenuItem
+) {
+    companion object {
+        val EMPTY: AppState = AppState(
+            menuItems = emptyList(),
+            currentScreen = MenuItem.Loading(content = {}, title = "Loading")
+        )
     }
 }
