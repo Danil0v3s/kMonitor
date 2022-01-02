@@ -15,10 +15,16 @@ repositories {
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+    maven("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
 }
 
 dependencies {
     implementation("net.java.dev.jna:jna-platform:5.9.0")
+    implementation("io.ktor:ktor-server-netty:2.0.0-eap-256")
+    implementation("io.ktor:ktor-html-builder:2.0.0-eap-256")
+    implementation("io.ktor:ktor-server-default-headers:2.0.0-eap-256")
+    implementation("io.ktor:ktor-server-call-logging:2.0.0-eap-256")
+    implementation("ch.qos.logback:logback-classic:1.2.6")
     implementation(compose.desktop.currentOs)
 }
 
@@ -52,5 +58,8 @@ spotless {
         trimTrailingWhitespace()
         indentWithTabs()
         endWithNewline()
+    }
+    kotlin {
+        ktlint()
     }
 }
