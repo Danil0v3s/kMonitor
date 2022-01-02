@@ -35,7 +35,7 @@ data class Header(
     val dwGpuEntrySize: Int,
     val lastCheck: Int
 ) {
-    companion object Signatures{
+    companion object Signatures {
         const val INITIALISED = "MAHM"
         const val DEAD = "0xDEAD"
     }

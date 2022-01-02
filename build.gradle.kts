@@ -5,6 +5,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.5.31"
     id("org.jetbrains.compose") version "1.0.0"
+    id("com.diffplug.spotless") version "6.1.0"
 }
 
 group = "br.com.firstsoft"
@@ -41,5 +42,15 @@ compose.desktop {
             packageName = "kMonitor"
             packageVersion = "0.0.1"
         }
+    }
+}
+
+spotless {
+    format("misc") {
+        target("*.gradle", "*.md", ".gitignore")
+
+        trimTrailingWhitespace()
+        indentWithTabs()
+        endWithNewline()
     }
 }
