@@ -8,6 +8,7 @@ output = [
   ].join('\n');
 -->
 [![License Apache](https://img.shields.io/badge/license-apache-brightgreen.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+[![Quality gate](https://sonarcloud.io/api/project_badges/quality_gate?project=Danil0v3s_kMonitor)](https://sonarcloud.io/summary/new_code?id=Danil0v3s_kMonitor)
 <!---freshmark /shields -->
 
 ### What is it?
