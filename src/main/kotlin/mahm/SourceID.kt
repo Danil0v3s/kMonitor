@@ -1,5 +1,8 @@
 package mahm
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class SourceID(val value: Int) {
     MONITORING_SOURCE_ID_UNKNOWN(-1),
     MONITORING_SOURCE_ID_GPU_TEMPERATURE(0x00000000),

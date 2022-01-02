@@ -1,5 +1,8 @@
 package mahm
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Header(
     /**
      * Allows applications to verify status of shared memory

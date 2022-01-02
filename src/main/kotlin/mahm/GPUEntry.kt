@@ -1,5 +1,8 @@
 package mahm
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class GPUEntry(
     /**
      * GPU identifier represented in VEN_%04X&DEV_%04X&SUBSYS_%08X&REV_%02X&BUS_%d&DEV_%d&FN_%d format

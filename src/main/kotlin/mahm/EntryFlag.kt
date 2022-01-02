@@ -1,5 +1,8 @@
 package mahm
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 enum class EntryFlag(val value: Int) {
     None(0),
     MAHM_SHARED_MEMORY_ENTRY_FLAG_SHOW_IN_OSD(0x00000001),

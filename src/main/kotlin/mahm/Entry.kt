@@ -1,5 +1,8 @@
 package mahm
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Entry(
     /**
      * mahm.Data source name
