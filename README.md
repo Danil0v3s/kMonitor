@@ -1,4 +1,4 @@
-# <img align="left" src="_imgs_/compose-logo.svg"> kMonitor: Your pc stats over the network
+# <img align="left" src="_imgs/compose-logo.svg" height=100> kMonitor: Your pc stats over the network
 
 <!---freshmark shields
 output = [
