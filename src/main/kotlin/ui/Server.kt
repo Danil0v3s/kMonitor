@@ -16,11 +16,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.ktor.application.ApplicationStarted
 import io.ktor.application.ApplicationStopped
-import io.ktor.application.call
 import io.ktor.application.install
 import io.ktor.features.ContentNegotiation
-import io.ktor.response.respond
-import io.ktor.routing.get
+import io.ktor.http.cio.websocket.send
 import io.ktor.routing.routing
 import io.ktor.serialization.json
 import io.ktor.server.engine.ApplicationEngineEnvironment
@@ -28,6 +26,11 @@ import io.ktor.server.engine.EngineConnectorConfig
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.netty.NettyApplicationEngine
+import io.ktor.websocket.WebSockets
+import io.ktor.websocket.webSocket
+import kotlinx.coroutines.flow.collect
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import mahm.Reader
 
 data class ServerState(
@@ -91,22 +94,27 @@ private fun startServer(
     onServerEvent: (ServerEvent) -> Unit
 ): NettyApplicationEngine {
     val server = embeddedServer(Netty, port = port) {
+        install(WebSockets)
         install(ContentNegotiation) {
             json()
         }
 
         routing {
-            get("/") {
-                call.respond(reader.readData())
+            webSocket("/socket") {
+                reader.currentData.collect {
+                    send(Json.encodeToString(it))
+                }
             }
         }
 
         environment.monitor.apply {
             subscribe(ApplicationStarted) {
+                reader.startPollingData()
                 onServerEvent(ServerEvent.Started((environment as ApplicationEngineEnvironment).connectors.first()))
             }
             subscribe(ApplicationStopped) {
                 onServerEvent(ServerEvent.Stopped)
+                reader.stopPolling()
             }
         }
     }.start(wait = false)

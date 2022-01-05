@@ -2,6 +2,19 @@
 
 package mahm
 
+import com.sun.jna.Pointer
+import com.sun.jna.platform.win32.WinNT
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import windows.WindowsService
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -11,29 +24,66 @@ private const val MAX_STRING_LENGTH = 260
 private const val BLOCK_SIZE = 118784
 private const val MEMORY_MAP_FILE_NAME = "MAHMSharedMemory"
 
-class Reader {
+class Reader(
+    private val coroutineDispatcher: CoroutineDispatcher
+) {
 
     private val windowsService = WindowsService()
+    private var pollingJob: Job? = null
 
-    fun readData(): Data {
-        return windowsService.openMemoryMapFile(MEMORY_MAP_FILE_NAME)?.let { handle ->
-            windowsService.mapViewOfFile(handle)?.let { pointer ->
-                val buffer = ByteBuffer.allocateDirect(BLOCK_SIZE)
-                buffer.put(pointer.getByteArray(0, BLOCK_SIZE))
-                buffer.order(ByteOrder.LITTLE_ENDIAN)
-                buffer.rewind()
+    private var memoryMapFile: WinNT.HANDLE? = null
+    private var pointer: Pointer? = null
 
-                val header = readHeader(buffer)
-                val entries = readCpuEntries(buffer, header.dwNumEntries)
-                val gpuEntries = readGpuEntries(buffer, header.dwNumGpuEntries)
+    private val _currentData = MutableStateFlow<Data?>(null)
+    val currentData: Flow<Data>
+        get() = _currentData.filterNotNull()
 
-                Data(
-                    header = header,
-                    entries = entries,
-                    gpuEntries = gpuEntries
-                )
+    fun startPollingData(intervalInMs: Long = 200L) {
+        tryOpenMemoryFile()
+        pollingJob?.cancel()
+        pointer ?: return
+        pollingJob = CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
+            while (true) {
+                try {
+                    _currentData.value = readData(pointer!!)
+                    delay(intervalInMs)
+                    yield()
+                } catch (e: CancellationException) {
+                    break
+                }
             }
+        }
+    }
+
+    fun stopPolling() {
+        pollingJob?.cancel()
+        pollingJob = null
+        pointer?.let { windowsService.unmapViewOfFile(it) }
+        memoryMapFile?.let { windowsService.closeHandle(it) }
+    }
+
+    private fun tryOpenMemoryFile() {
+        windowsService.openMemoryMapFile(MEMORY_MAP_FILE_NAME)?.let { handle ->
+            memoryMapFile = handle
+            pointer = windowsService.mapViewOfFile(handle) ?: throw Error("Could not create pointer")
         } ?: throw Error("Could not read MAHMSharedMemory")
+    }
+
+    private fun readData(pointer: Pointer): Data {
+        val buffer = ByteBuffer.allocateDirect(BLOCK_SIZE)
+        buffer.put(pointer.getByteArray(0, BLOCK_SIZE))
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+        buffer.rewind()
+
+        val header = readHeader(buffer)
+        val entries = readCpuEntries(buffer, header.dwNumEntries)
+        val gpuEntries = readGpuEntries(buffer, header.dwNumGpuEntries)
+
+        return Data(
+            header = header,
+            entries = entries,
+            gpuEntries = gpuEntries
+        )
     }
 
     private fun readHeader(buffer: ByteBuffer) = Header(
