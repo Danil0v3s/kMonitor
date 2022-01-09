@@ -6,15 +6,9 @@ import com.sun.jna.Pointer
 import com.sun.jna.platform.win32.WinNT
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.flow.flow
 import windows.WindowsService
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -34,23 +28,17 @@ class Reader(
     private var memoryMapFile: WinNT.HANDLE? = null
     private var pointer: Pointer? = null
 
-    private val _currentData = MutableStateFlow<Data?>(null)
-    val currentData: Flow<Data>
-        get() = _currentData.filterNotNull()
-
-    fun startPollingData(intervalInMs: Long = 200L) {
+    var pollingInterval = 200L
+    val currentData = flow<Data?> {
         tryOpenMemoryFile()
-        pollingJob?.cancel()
-        pointer ?: return
-        pollingJob = CoroutineScope(coroutineDispatcher + SupervisorJob()).launch {
-            while (true) {
-                try {
-                    _currentData.value = readData(pointer!!)
-                    delay(intervalInMs)
-                    yield()
-                } catch (e: CancellationException) {
-                    break
-                }
+        pointer ?: return@flow
+
+        while (true) {
+            try {
+                emit(readData(pointer!!))
+                delay(pollingInterval)
+            } catch (e: CancellationException) {
+                break
             }
         }
     }
@@ -62,7 +50,7 @@ class Reader(
         memoryMapFile?.let { windowsService.closeHandle(it) }
     }
 
-    private fun tryOpenMemoryFile() {
+    fun tryOpenMemoryFile() {
         windowsService.openMemoryMapFile(MEMORY_MAP_FILE_NAME)?.let { handle ->
             memoryMapFile = handle
             pointer = windowsService.mapViewOfFile(handle) ?: throw Error("Could not create pointer")

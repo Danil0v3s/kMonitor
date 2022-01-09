@@ -20,12 +20,17 @@ repositories {
 
 dependencies {
     implementation("net.java.dev.jna:jna-platform:5.9.0")
+
     implementation("io.ktor:ktor-server-netty:1.6.7")
     implementation("io.ktor:ktor-websockets:1.6.7")
     implementation("io.ktor:ktor-serialization:1.6.7")
     implementation("io.ktor:ktor-server-core:1.6.7")
+    implementation("io.ktor:ktor-auth:1.6.7")
+
     implementation("ch.qos.logback:logback-classic:1.2.10")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
+
     implementation(compose.desktop.currentOs)
 }
 
