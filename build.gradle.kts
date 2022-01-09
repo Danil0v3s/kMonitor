@@ -10,7 +10,7 @@ plugins {
 }
 
 group = "br.com.firstsoft"
-version = "0.0.1"
+version = "0.0.2"
 
 repositories {
     google()
@@ -52,7 +52,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi)
             packageName = "kMonitor"
-            packageVersion = "0.0.1"
+            packageVersion = "0.0.2"
         }
     }
 }
