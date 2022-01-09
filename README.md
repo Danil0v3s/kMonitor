@@ -11,5 +11,15 @@ link(shield('License Apache', 'license', 'apache', 'brightgreen'), 'https://tldr
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Danil0v3s_kMonitor&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Danil0v3s_kMonitor)
 <!---freshmark /shields -->
 
-### What is it?
+### What is this?
 A small desktop companion application to enable you to provide MSI Afterburner data to your network
+
+### What does it have?
+- :white_check_mark: A simple websocket server to stream your data over your local the network
+- :soon: More configuration options
+- :soon: Registering as a service to start with Windows
+
+### Getting started
+1. Make sure you have MSI Afterburner up and running
+2. Download the latest release, run it and start the server
+3. Connect to the websocket using `ws://<your ip>/socket`
