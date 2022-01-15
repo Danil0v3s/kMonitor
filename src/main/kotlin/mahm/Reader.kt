@@ -5,22 +5,23 @@ package mahm
 import com.sun.jna.Pointer
 import com.sun.jna.platform.win32.WinNT
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
+import mahm.MAHMSizes.MAX_STRING_LENGTH
 import windows.WindowsService
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 import java.nio.charset.StandardCharsets
 
-private const val MAX_STRING_LENGTH = 260
-private const val BLOCK_SIZE = 118784
+object MAHMSizes {
+    const val HEADER_SIZE = 32
+    const val MAX_STRING_LENGTH = 260
+}
+
 private const val MEMORY_MAP_FILE_NAME = "MAHMSharedMemory"
 
-class Reader(
-    private val coroutineDispatcher: CoroutineDispatcher
-) {
+class Reader {
 
     private val windowsService = WindowsService()
     private var pollingJob: Job? = null
@@ -57,13 +58,15 @@ class Reader(
         } ?: throw Error("Could not read MAHMSharedMemory")
     }
 
-    private fun readData(pointer: Pointer): Data {
-        val buffer = ByteBuffer.allocateDirect(BLOCK_SIZE)
-        buffer.put(pointer.getByteArray(0, BLOCK_SIZE))
-        buffer.order(ByteOrder.LITTLE_ENDIAN)
-        buffer.rewind()
+    private fun readHeader(pointer: Pointer): Header {
+        val buffer = getByteBuffer(pointer, MAHMSizes.HEADER_SIZE)
 
-        val header = readHeader(buffer)
+        return readHeader(buffer)
+    }
+
+    private fun readData(pointer: Pointer): Data {
+        val header = readHeader(pointer)
+        val buffer = getByteBuffer(pointer, header.totalSize, header.dwHeaderSize)
         val entries = readCpuEntries(buffer, header.dwNumEntries)
         val gpuEntries = readGpuEntries(buffer, header.dwNumGpuEntries)
 
@@ -72,6 +75,16 @@ class Reader(
             entries = entries,
             gpuEntries = gpuEntries
         )
+    }
+
+    private fun getByteBuffer(pointer: Pointer, size: Int, skip: Int = 0): ByteBuffer {
+        val buffer = ByteBuffer.allocateDirect(size)
+        buffer.put(pointer.getByteArray(0, size))
+        buffer.order(ByteOrder.LITTLE_ENDIAN)
+        buffer.rewind()
+        buffer.position(skip)
+
+        return buffer
     }
 
     private fun readHeader(buffer: ByteBuffer) = Header(

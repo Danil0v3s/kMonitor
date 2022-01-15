@@ -6,7 +6,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import mahm.Reader
@@ -29,7 +28,7 @@ fun App(
 
 class AppViewModel {
 
-    private val reader = Reader(Dispatchers.IO)
+    private val reader = Reader()
 
     private val menuItems = listOf(
         MenuItem.Server(

@@ -42,4 +42,7 @@ data class Header(
         const val INITIALISED = "MAHM"
         const val DEAD = "0xDEAD"
     }
+
+    val totalSize: Int
+        get() = (dwNumEntries * dwEntrySize) + (dwNumGpuEntries * dwGpuEntrySize) + dwHeaderSize
 }
