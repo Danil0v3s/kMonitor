@@ -15,6 +15,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import win32.WinRegistry
 
 class Settings
 
@@ -23,7 +24,7 @@ fun SettingsUi() = Box(
     modifier = Modifier
         .padding(16.dp)
 ) {
-    var state by remember { mutableStateOf(false) }
+    var state by remember { mutableStateOf(WinRegistry.isAppRegisteredToStartWithWindows()) }
 
     Column {
         Title(text = "App settings")
@@ -32,10 +33,10 @@ fun SettingsUi() = Box(
         ) {
             Checkbox(
                 checked = state,
-                onCheckedChange = { value -> state = value}
+                onCheckedChange = { value -> state = value }
             )
 
-            Label(text = "Start with the system")
+            Label(text = "Start with Windows")
         }
     }
 }
