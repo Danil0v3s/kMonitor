@@ -3,15 +3,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
-import ui.App
+import ui.app.App
 
 fun main() = application {
     val icon = painterResource("imgs/logo.svg")
-    val state = rememberWindowState()
+    val state = rememberWindowState().apply {
+        size = DpSize(300.dp,500.dp)
+    }
     var isVisible by remember { mutableStateOf(true) }
 
     Window(
@@ -19,7 +23,8 @@ fun main() = application {
         onCloseRequest = { isVisible = false },
         icon = icon,
         visible = isVisible,
-        title = "kMonitor"
+        title = "kMonitor",
+        resizable = false
     ) {
         App()
     }

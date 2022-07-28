@@ -1,5 +1,6 @@
 package ui
 
+import Title
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -76,20 +78,11 @@ fun ServerUi(
 
     Box(
         modifier = Modifier
-            .fillMaxSize()
             .padding(16.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxSize()
-        ) {
+        Row {
             Column {
-                Text(
-                    text = "Server Configuration",
-                    style = TextStyle(
-                        fontSize = 18.sp
-                    )
-                )
+                Title(text = "Server configuration")
 
                 Row(
                     modifier = Modifier.padding(bottom = 8.dp),
@@ -129,42 +122,42 @@ fun ServerUi(
                         label = { Text("Password") }
                     )
                 }
-            }
-        }
 
-        serverButtonRows(
-            state = state,
-            onStopServerClicked = {
-                if (state.isRunning) {
-                    server?.stop(1000L, 3000L)
-                }
-            },
-            onStartServerClicked = {
-                if (!state.isRunning) {
-                    server = startServer(reader, state) {
-                        state = when (it) {
-                            is ServerEvent.Started -> {
-                                state.copy(isRunning = true)
-                            }
-                            is ServerEvent.Stopped -> {
-                                state.copy(isRunning = false)
+                serverButtonRows(
+                    state = state,
+                    onStopServerClicked = {
+                        if (state.isRunning) {
+                            server?.stop(1000L, 3000L)
+                        }
+                    },
+                    onStartServerClicked = {
+                        if (!state.isRunning) {
+                            server = startServer(reader, state) {
+                                state = when (it) {
+                                    is ServerEvent.Started -> {
+                                        state.copy(isRunning = true)
+                                    }
+
+                                    is ServerEvent.Stopped -> {
+                                        state.copy(isRunning = false)
+                                    }
+                                }
                             }
                         }
                     }
-                }
+                )
             }
-        )
+        }
     }
 }
 
 @Composable
-fun BoxScope.serverButtonRows(
+fun serverButtonRows(
     state: ServerState,
     onStopServerClicked: () -> Unit,
     onStartServerClicked: () -> Unit
 ) {
     Row(
-        modifier = Modifier.align(Alignment.BottomEnd),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Button(onClick = { onStopServerClicked() }, enabled = state.isRunning) {
