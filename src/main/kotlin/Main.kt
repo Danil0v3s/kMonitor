@@ -14,7 +14,7 @@ import ui.app.App
 fun main() = application {
     val icon = painterResource("imgs/logo.svg")
     val state = rememberWindowState().apply {
-        size = DpSize(300.dp,500.dp)
+        size = DpSize(300.dp, 500.dp)
     }
     var isVisible by remember { mutableStateOf(true) }
 

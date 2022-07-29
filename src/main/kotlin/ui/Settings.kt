@@ -33,10 +33,53 @@ fun SettingsUi() = Box(
         ) {
             Checkbox(
                 checked = state,
-                onCheckedChange = { value -> state = value }
+                onCheckedChange = { value ->
+                    state = value
+                    if (value) {
+                        WinRegistry.registerAppToStartWithWindows()
+                    } else {
+                        WinRegistry.removeAppFromStartWithWindows()
+                    }
+                }
             )
 
             Label(text = "Start with Windows")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(
+                checked = state,
+                onCheckedChange = { value ->
+                    state = value
+                    if (value) {
+                        WinRegistry.registerAppToStartWithWindows()
+                    } else {
+                        WinRegistry.removeAppFromStartWithWindows()
+                    }
+                }
+            )
+
+            Label(text = "Start minimized")
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Checkbox(
+                checked = state,
+                onCheckedChange = { value ->
+                    state = value
+                    if (value) {
+                        WinRegistry.registerAppToStartWithWindows()
+                    } else {
+                        WinRegistry.removeAppFromStartWithWindows()
+                    }
+                }
+            )
+
+            Label(text = "Auto start server")
         }
     }
 }

@@ -8,8 +8,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mahm.Reader
-import ui.SettingsUi
 import ui.ServerUi
+import ui.SettingsUi
 
 @Composable
 fun App(
@@ -23,7 +23,3 @@ fun App(
         }
     }
 }
-
-
-
-
