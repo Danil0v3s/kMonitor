@@ -53,7 +53,7 @@ compose.desktop {
         nativeDistributions {
             targetFormats(TargetFormat.Msi)
             packageName = "kMonitor"
-            packageVersion = "0.0.2"
+            packageVersion = "0.0.3"
         }
     }
 }
