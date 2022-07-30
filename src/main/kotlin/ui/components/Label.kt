@@ -1,16 +1,13 @@
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 
 @Composable
 fun Label(
-    text: String
+    text: String,
+    style: TextStyle = MaterialTheme.typography.subtitle2
 ) = Text(
     text = text,
-    style = TextStyle(
-        fontSize = 14.sp,
-        fontWeight = FontWeight.Medium
-    )
+    style = style
 )
