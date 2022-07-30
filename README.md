@@ -9,6 +9,7 @@ link(shield('License Apache', 'license', 'apache', 'brightgreen'), 'https://tldr
 -->
 [![License Apache](https://img.shields.io/badge/license-apache-brightgreen.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Danil0v3s_kMonitor&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Danil0v3s_kMonitor)
+[<img alt="Buy me a coffee!" width="170px" src="https://ko-fi.com/img/githubbutton_sm.svg" />](https://ko-fi.com/O4O8E3U08)
 <!---freshmark /shields -->
 
 ### What is this?
