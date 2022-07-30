@@ -2,11 +2,18 @@ package ui
 
 import Label
 import Title
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CheckboxDefaults
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AdminPanelSettings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,14 +35,15 @@ fun SettingsUi() = Box(
 ) {
     Column {
         Title(text = "App settings")
-        StartWithWindowsCheckbox()
-        StartMinimizedCheckbox()
-        AutoStartServerCheckbox()
+        startWithWindowsCheckbox()
+        startMinimizedCheckbox()
+        autoStartServerCheckbox()
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun StartWithWindowsCheckbox() {
+private fun startWithWindowsCheckbox() {
     var state by remember { mutableStateOf(WinRegistry.isAppRegisteredToStartWithWindows()) }
 
     Row(
@@ -50,15 +58,22 @@ private fun StartWithWindowsCheckbox() {
                 } else {
                     WinRegistry.removeAppFromStartWithWindows()
                 }
-            }
+            },
+            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary)
         )
 
         Label(text = "Start with Windows")
+
+        TooltipArea({
+            Label(text = "Admin rights needed")
+        }) {
+            Icon(imageVector = Icons.Filled.AdminPanelSettings, null)
+        }
     }
 }
 
 @Composable
-private fun StartMinimizedCheckbox() {
+private fun startMinimizedCheckbox() {
     var state by remember { mutableStateOf(PreferencesRepository.getPreferenceBoolean(PREFERENCE_START_MINIMIZED)) }
 
     Row(
@@ -69,7 +84,8 @@ private fun StartMinimizedCheckbox() {
             onCheckedChange = { value ->
                 state = value
                 PreferencesRepository.setPreferenceBoolean(PREFERENCE_START_MINIMIZED, value)
-            }
+            },
+            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary)
         )
 
         Label(text = "Start minimized")
@@ -77,7 +93,7 @@ private fun StartMinimizedCheckbox() {
 }
 
 @Composable
-private fun AutoStartServerCheckbox() {
+private fun autoStartServerCheckbox() {
     var state by remember { mutableStateOf(PreferencesRepository.getPreferenceBoolean(PREFERENCE_AUTO_START_SERVER)) }
 
     Row(
@@ -88,7 +104,8 @@ private fun AutoStartServerCheckbox() {
             onCheckedChange = { value ->
                 state = value
                 PreferencesRepository.setPreferenceBoolean(PREFERENCE_AUTO_START_SERVER, value)
-            }
+            },
+            colors = CheckboxDefaults.colors(checkedColor = MaterialTheme.colors.primary)
         )
 
         Label(text = "Auto start server")

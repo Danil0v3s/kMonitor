@@ -39,7 +39,7 @@ object WinRegistry {
     fun isAppRegisteredToStartWithWindows(): Boolean {
         val queryOutput = read(STARTUP_ITEMS_LOCATION, REGISTRY_APP_NAME)
 
-        return queryOutput.map { it.indexOf(REGISTRY_APP_NAME) >= 0 }.any()
+        return queryOutput.map { it.indexOf(REGISTRY_APP_NAME) >= 0 }.any { it }
     }
 
     fun registerAppToStartWithWindows() {
