@@ -18,7 +18,7 @@ link(shield('License Apache', 'license', 'apache', 'brightgreen'), 'https://tldr
 A small desktop companion application to enable you to provide MSI Afterburner data to your network
 
 ### What does it have?
-- :white_check_mark: A simple websocket server to stream your data over your local the network
+- :white_check_mark: A simple websocket server to stream your data over your local network
 - :white_check_mark: More configuration options
 - :white_check_mark: Registering as a service to start with Windows
 - :soon: Desktop shortcut
