@@ -19,6 +19,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mahm.Reader
+import repository.PreferencesRepository
 
 data class ServerState(
     val isRunning: Boolean = false,
@@ -61,15 +63,39 @@ sealed class ServerEvent {
     object Stopped : ServerEvent()
 }
 
-class Server
-
 @Composable
 fun ServerUi(
     reader: Reader
 ) {
     var state by remember { mutableStateOf(ServerState()) }
-    var server by remember { mutableStateOf<NettyApplicationEngine?>(null) }
+    fun updateState(serverEvent: ServerEvent) {
+        state = when (serverEvent) {
+            is ServerEvent.Started -> {
+                state.copy(isRunning = true)
+            }
+
+            is ServerEvent.Stopped -> {
+                state.copy(isRunning = false)
+            }
+        }
+    }
+
+    var server by remember {
+        mutableStateOf(
+            createServer(
+                reader = reader,
+                options = state,
+                onServerEvent = ::updateState
+            )
+        )
+    }
     val pollingRateOptions = listOf("200", "300", "400", "500", "600")
+
+    LaunchedEffect(Unit) {
+        if (PreferencesRepository.getPreferenceBoolean(PREFERENCE_AUTO_START_SERVER, false)) {
+            server.start(wait = false)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -122,22 +148,17 @@ fun ServerUi(
                     state = state,
                     onStopServerClicked = {
                         if (state.isRunning) {
-                            server?.stop(1000L, 3000L)
+                            server.stop(1000L, 3000L)
                         }
                     },
                     onStartServerClicked = {
                         if (!state.isRunning) {
-                            server = startServer(reader, state) {
-                                state = when (it) {
-                                    is ServerEvent.Started -> {
-                                        state.copy(isRunning = true)
-                                    }
-
-                                    is ServerEvent.Stopped -> {
-                                        state.copy(isRunning = false)
-                                    }
-                                }
-                            }
+                            server = createServer(
+                                reader = reader,
+                                options = state,
+                                onServerEvent = ::updateState
+                            )
+                            server.start(wait = false)
                         }
                     }
                 )
@@ -209,12 +230,12 @@ fun DropdownMenu(
     }
 }
 
-private fun startServer(
+private fun createServer(
     reader: Reader,
     options: ServerState,
     onServerEvent: (ServerEvent) -> Unit
 ): NettyApplicationEngine {
-    val server = embeddedServer(Netty, port = options.port.toInt()) {
+    return embeddedServer(Netty, port = options.port.toInt()) {
         install(WebSockets)
         install(Authentication) {
             basic("auth-basic") {
@@ -249,7 +270,5 @@ private fun startServer(
                 reader.stopPolling()
             }
         }
-    }.start(wait = false)
-
-    return server
+    }
 }

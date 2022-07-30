@@ -15,71 +15,82 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import repository.PreferencesRepository
 import win32.WinRegistry
 
-class Settings
+const val PREFERENCE_AUTO_START_SERVER = "PREFERENCE_AUTO_START_SERVER"
+const val PREFERENCE_START_MINIMIZED = "PREFERENCE_START_MINIMIZED"
 
 @Composable
 fun SettingsUi() = Box(
     modifier = Modifier
         .padding(16.dp)
 ) {
-    var state by remember { mutableStateOf(WinRegistry.isAppRegisteredToStartWithWindows()) }
-
     Column {
         Title(text = "App settings")
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(
-                checked = state,
-                onCheckedChange = { value ->
-                    state = value
-                    if (value) {
-                        WinRegistry.registerAppToStartWithWindows()
-                    } else {
-                        WinRegistry.removeAppFromStartWithWindows()
-                    }
+        StartWithWindowsCheckbox()
+        StartMinimizedCheckbox()
+        AutoStartServerCheckbox()
+    }
+}
+
+@Composable
+private fun StartWithWindowsCheckbox() {
+    var state by remember { mutableStateOf(WinRegistry.isAppRegisteredToStartWithWindows()) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = state,
+            onCheckedChange = { value ->
+                state = value
+                if (value) {
+                    WinRegistry.registerAppToStartWithWindows()
+                } else {
+                    WinRegistry.removeAppFromStartWithWindows()
                 }
-            )
+            }
+        )
 
-            Label(text = "Start with Windows")
-        }
+        Label(text = "Start with Windows")
+    }
+}
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(
-                checked = state,
-                onCheckedChange = { value ->
-                    state = value
-                    if (value) {
-                        WinRegistry.registerAppToStartWithWindows()
-                    } else {
-                        WinRegistry.removeAppFromStartWithWindows()
-                    }
-                }
-            )
+@Composable
+private fun StartMinimizedCheckbox() {
+    var state by remember { mutableStateOf(PreferencesRepository.getPreferenceBoolean(PREFERENCE_START_MINIMIZED)) }
 
-            Label(text = "Start minimized")
-        }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = state,
+            onCheckedChange = { value ->
+                state = value
+                PreferencesRepository.setPreferenceBoolean(PREFERENCE_START_MINIMIZED, value)
+            }
+        )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            Checkbox(
-                checked = state,
-                onCheckedChange = { value ->
-                    state = value
-                    if (value) {
-                        WinRegistry.registerAppToStartWithWindows()
-                    } else {
-                        WinRegistry.removeAppFromStartWithWindows()
-                    }
-                }
-            )
+        Label(text = "Start minimized")
+    }
+}
 
-            Label(text = "Auto start server")
-        }
+@Composable
+private fun AutoStartServerCheckbox() {
+    var state by remember { mutableStateOf(PreferencesRepository.getPreferenceBoolean(PREFERENCE_AUTO_START_SERVER)) }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Checkbox(
+            checked = state,
+            onCheckedChange = { value ->
+                state = value
+                PreferencesRepository.setPreferenceBoolean(PREFERENCE_AUTO_START_SERVER, value)
+            }
+        )
+
+        Label(text = "Auto start server")
     }
 }

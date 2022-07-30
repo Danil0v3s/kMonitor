@@ -9,6 +9,8 @@ import androidx.compose.ui.window.Tray
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import repository.PreferencesRepository
+import ui.PREFERENCE_START_MINIMIZED
 import ui.app.App
 
 fun main() = application {
@@ -16,7 +18,7 @@ fun main() = application {
     val state = rememberWindowState().apply {
         size = DpSize(300.dp, 500.dp)
     }
-    var isVisible by remember { mutableStateOf(true) }
+    var isVisible by remember { mutableStateOf(PreferencesRepository.getPreferenceBooleanNullable(PREFERENCE_START_MINIMIZED)?.not() ?: true) }
 
     Window(
         state = state,
