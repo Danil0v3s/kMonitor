@@ -16,7 +16,7 @@ import ui.app.App
 fun main() = application {
     val icon = painterResource("imgs/logo.svg")
     val state = rememberWindowState().apply {
-        size = DpSize(300.dp, 500.dp)
+        size = DpSize(300.dp, 530.dp)
     }
     var isVisible by remember { mutableStateOf(PreferencesRepository.getPreferenceBooleanNullable(PREFERENCE_START_MINIMIZED)?.not() ?: true) }
 

@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import mahm.Reader
+import ui.FooterUi
 import ui.ServerUi
 import ui.SettingsUi
 
@@ -20,6 +21,7 @@ fun App(
             ServerUi(reader)
             Divider()
             SettingsUi()
+            FooterUi()
         }
     }
 }
