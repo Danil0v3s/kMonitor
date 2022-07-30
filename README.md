@@ -12,12 +12,16 @@ link(shield('License Apache', 'license', 'apache', 'brightgreen'), 'https://tldr
 <!---freshmark /shields -->
 
 ### What is this?
+![image](https://user-images.githubusercontent.com/13068064/181916509-d0e8811f-0387-4498-b5bb-787e1e8484c6.png)
+
 A small desktop companion application to enable you to provide MSI Afterburner data to your network
 
 ### What does it have?
 - :white_check_mark: A simple websocket server to stream your data over your local the network
-- :soon: More configuration options
-- :soon: Registering as a service to start with Windows
+- :white_check_mark: More configuration options
+- :white_check_mark: Registering as a service to start with Windows
+- :soon: Desktop shortcut
+- :soon: More robust API
 
 ### Getting started
 1. Make sure you have MSI Afterburner up and running
