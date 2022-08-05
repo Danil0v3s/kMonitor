@@ -50,9 +50,12 @@ import io.ktor.server.netty.NettyApplicationEngine
 import io.ktor.websocket.WebSockets
 import io.ktor.websocket.webSocket
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import mahm.Reader
+import mahm.SourceID
+import mahm.dto.toDTO
 import repository.PreferencesRepository
 
 data class ServerState(
@@ -287,8 +290,35 @@ private fun createServer(
         routing {
             authenticate("auth-basic") {
                 webSocket("/socket") {
-                    reader.currentData.collect {
-                        send(Json.encodeToString(it))
+                    reader.currentData.filterNotNull().collect {
+                        val queryParams = call.request.queryParameters
+                        val filters = queryParams["filter"]?.split(",").orEmpty().map { SourceID.fromString(it) }
+                        val shouldUseDto = queryParams["slim"]?.toBoolean() ?: false
+
+                        val result = when {
+                            filters.isNotEmpty() && shouldUseDto -> {
+                                val result = it.copy(
+                                    entries = it.entries.filter {
+                                        filters.contains(it.dwSrcId)
+                                    }
+                                )
+                                Json.encodeToString(result.toDTO())
+                            }
+
+                            filters.isNotEmpty() -> {
+                                val result = it.copy(
+                                    entries = it.entries.filter {
+                                        filters.contains(it.dwSrcId)
+                                    }
+                                )
+                                Json.encodeToString(result)
+                            }
+
+                            shouldUseDto -> Json.encodeToString(it.toDTO())
+                            else -> Json.encodeToString(it)
+                        }
+
+                        send(result)
                     }
                 }
             }

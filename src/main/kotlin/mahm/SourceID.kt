@@ -74,5 +74,7 @@ enum class SourceID(val value: Int) {
 
     companion object {
         fun fromInt(value: Int) = values().firstOrNull { it.value == value } ?: MONITORING_SOURCE_ID_UNKNOWN
+
+        fun fromString(value: String) = values().firstOrNull { it.name == value } ?: MONITORING_SOURCE_ID_UNKNOWN
     }
 }
